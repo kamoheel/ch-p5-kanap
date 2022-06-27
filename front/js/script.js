@@ -25,6 +25,7 @@ fetch("http://localhost:3000/api/products", {
               </a>
             `;
             itemsDiv.innerHTML += itemCard;
+
         }
     })
     .catch(function(err){
