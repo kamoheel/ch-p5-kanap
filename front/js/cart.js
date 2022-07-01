@@ -25,8 +25,6 @@ fetch("http://localhost:3000/api/products", {
             let cartDisplay = document.getElementById('cart__items');
             let cartContent = JSON.parse(localStorage.getItem('cartItems'));
             for (let product of cartContent){
-                for (i = 0; i < data.length; i++)
-
                 var productPrice = getProductInfo(product.id)[0];
                 let imgURL = getProductInfo(product.id)[1];
                 let description = getProductInfo(product.id)[2];
@@ -47,7 +45,7 @@ fetch("http://localhost:3000/api/products", {
                 <div class="cart__item__content">
                 <div class="cart__item__content__description">
                     <h2>${name}</h2>
-                    <p>${product.color}</p>
+                    <p id="product-color">${product.color}</p>
                     <p>${productPrice} €</p>
                 </div>
                 <div class="cart__item__content__settings">
@@ -60,8 +58,52 @@ fetch("http://localhost:3000/api/products", {
                     </div>
                 </div>
                 </div>
-                </article>`;
+                `;
+                
             }
+
+            //Handle modification of quantity in the cart
+            function modifyQuantity(){
+                //getting the list of itemQuantity Classes
+                let cartItemQuantity = document.getElementsByClassName('itemQuantity');
+                // Loop through each class = cartItem
+                for (let i = 0; i < cartItemQuantity.length; i++){
+                        //Monitor a change in quantity
+                        cartItemQuantity[i].addEventListener('change', function(event){
+                            event.preventDefault();
+
+                            //closest ancestor that is has the data-id attribute (article)
+                            let article = cartItemQuantity[i].closest('[data-id]');
+                            //get the id of the item for which the quantity has been modified
+                            let idChangedQuantity = article.getAttribute('data-id');
+                            console.log(idChangedQuantity);
+                            //get the color
+                            let colorChangedQuantity = article.getAttribute('data-color');
+                            console.log(colorChangedQuantity);
+                            
+                            //find the product in localStorage to modify the quantity stored
+                            const findProduct = cartContent.find(
+                                (element) => element.id === idChangedQuantity && element.color === colorChangedQuantity
+                            );
+                            if (findProduct) {
+                                let quantityModified = cartItemQuantity[i].valueAsNumber;
+                                if (quantityModified > 100) {
+                                    findProduct.quantity = 100;
+                                }
+                                //  else if (quantityModified = 0) {
+                                //     localStorage.removeItem(findProduct);
+                                //} 
+                                else {
+                                    findProduct.quantity = quantityModified;
+                                }
+                                localStorage.setItem('cartItems', JSON.stringify(cartContent));
+                                console.table(cartContent);
+                                return true;
+                            }
+                    })
+                }
+            }
+            modifyQuantity();
         })
         .catch(function(err){
             console.log("Une erreur est survenue")
