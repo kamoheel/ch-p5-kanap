@@ -62,6 +62,22 @@ fetch("http://localhost:3000/api/products", {
                 
             }
 
+            function getClosestIdAndColor(element){
+                //closest ancestor that is has the data-id attribute (article)
+                let article = element.closest('[data-id]');
+                //get the id of the item for which the quantity has been modified
+                let cartElementId = article.getAttribute('data-id');
+                //get the color
+                let cartElementColor = article.getAttribute('data-color');
+                return [cartElementId, cartElementColor];
+            }
+
+            function findLS(id, color){
+                const findProductLS = cartContent.find(
+                    (element) => element.id === id && element.color === color
+                );
+                return findProductLS;
+            }
             //Handle modification of quantity in the cart
             function modifyQuantity(){
                 //getting the list of itemQuantity Classes
@@ -72,19 +88,19 @@ fetch("http://localhost:3000/api/products", {
                         cartItemQuantity[i].addEventListener('change', function(event){
                             event.preventDefault();
 
-                            //closest ancestor that is has the data-id attribute (article)
-                            let article = cartItemQuantity[i].closest('[data-id]');
-                            //get the id of the item for which the quantity has been modified
-                            let idChangedQuantity = article.getAttribute('data-id');
-                            console.log(idChangedQuantity);
-                            //get the color
-                            let colorChangedQuantity = article.getAttribute('data-color');
-                            console.log(colorChangedQuantity);
+                            // //closest ancestor that is has the data-id attribute (article)
+                            // let article = cartItemQuantity[i].closest('[data-id]');
+                            // //get the id of the item for which the quantity has been modified
+                            // let idChangedQuantity = article.getAttribute('data-id');
+                            // console.log(idChangedQuantity);
+                            // //get the color
+                            // let colorChangedQuantity = article.getAttribute('data-color');
+                            // console.log(colorChangedQuantity);
+                            let cartElementId = getClosestIdAndColor(cartItemQuantity[i])[0];
+                            let cartElementColor = getClosestIdAndColor(cartItemQuantity[i])[1];
                             
                             //find the product in localStorage to modify the quantity stored
-                            const findProduct = cartContent.find(
-                                (element) => element.id === idChangedQuantity && element.color === colorChangedQuantity
-                            );
+                            let findProduct = findLS(cartElementId, cartElementColor);
                             if (findProduct) {
                                 let quantityModified = cartItemQuantity[i].valueAsNumber;
                                 if (quantityModified > 100) {
@@ -104,6 +120,35 @@ fetch("http://localhost:3000/api/products", {
                 }
             }
             modifyQuantity();
+
+            function deleteProduct() {
+                let deleteButton = document.getElementsByClassName('deleteItem');
+                for(let k = 0; k < deleteButton.length; k++){
+                    deleteButton[k].addEventListener("click", function(event){
+                        event.preventDefault();
+
+                        let cartElementId = getClosestIdAndColor(deleteButton[k])[0];
+                        let cartElementColor = getClosestIdAndColor(deleteButton[k])[1];
+                        let findProduct = findLS(cartElementId, cartElementColor);
+                        if(findProduct){
+                            console.log(findProduct.id);
+                            console.log(findProduct.quantity);
+                            console.log(findProduct);
+                            //To delete the item in the localStorage array
+                            cartContent.splice(findProduct, 1);
+                            localStorage.setItem('cartItems', JSON.stringify(cartContent));
+                            console.table(cartContent);
+                            window.location.reload();
+                            return true;
+                        }                      
+                    })
+                }
+            }
+            deleteProduct();
+
+
+            
+            
         })
         .catch(function(err){
             console.log("Une erreur est survenue")
