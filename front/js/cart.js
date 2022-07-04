@@ -114,6 +114,7 @@ fetch("http://localhost:3000/api/products", {
                                 }
                                 localStorage.setItem('cartItems', JSON.stringify(cartContent));
                                 console.table(cartContent);
+                                window.location.reload();
                                 return true;
                             }
                     })
@@ -135,7 +136,7 @@ fetch("http://localhost:3000/api/products", {
                             console.log(findProduct.quantity);
                             console.log(findProduct);
                             //To delete the item in the localStorage array
-                            cartContent.splice(findProduct, 1);
+                            cartContent.splice(cartContent.indexOf(findProduct), 1);
                             localStorage.setItem('cartItems', JSON.stringify(cartContent));
                             console.table(cartContent);
                             window.location.reload();
@@ -146,9 +147,16 @@ fetch("http://localhost:3000/api/products", {
             }
             deleteProduct();
 
+            //display total price
+            let articleQuantity = document.getElementById('totalQuantity');
+            articleQuantity.innerHTML = `${cartContent.length}`;
 
-            
-            
+            let totalPrice = document.getElementById('totalPrice');
+            let sum = 0;
+            for (let l = 0; l < cartContent.length; l++) {
+                sum += (cartContent[l].quantity) * (getProductInfo(cartContent[l].id)[0])
+            };
+            totalPrice.innerHTML = `${sum}`;
         })
         .catch(function(err){
             console.log("Une erreur est survenue")
