@@ -1,4 +1,4 @@
-
+let products = [];
 fetch("http://localhost:3000/api/products", {
         method: 'GET'
     })
@@ -30,7 +30,7 @@ fetch("http://localhost:3000/api/products", {
                 let description = getProductInfo(product.id)[2];
                 let name = getProductInfo(product.id)[3];
                 let altText = getProductInfo(product.id)[4];
-
+                products.push(product.id);
                 //create Article so that the products are displayed as a list
                 let itemArticle = document.createElement("article");
                 cartDisplay.appendChild(itemArticle);
@@ -161,6 +161,140 @@ fetch("http://localhost:3000/api/products", {
         .catch(function(err){
             console.log("Une erreur est survenue")
         })
+
+//Form Validation
+let order = document.getElementById('order');
+let contact = {
+    firstName: document.getElementById('firstName'),
+    lastName: document.getElementById('lastName'),
+    address: document.getElementById('address'),
+    city: document.getElementById('city'),
+    email: document.getElementById('email'),
+};
+order.addEventListener('click', function(event){
+    event.preventDefault();
+
+
+
+    function wordRegex(value){
+        return /^[A-Z][A-Za-z\é\è\ê\-]+$/.test(value);
+    } //accepte lettres minuscules, majuscule, tiret, espace (s), plusieurs iterations(+)
+
+    function addressRegex(value){
+        return /^[a-zA-Z0-9\s,'-]*$/.test(value);
+    }
+
+    function emailRegex(value){
+        return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
+    }
+
+    function validateFirstName(){
+        let firstNameErrorMessage = document.getElementById('firstNameErrorMsg');   
+        if (wordRegex(contact.firstName.value)) {
+            firstNameErrorMessage.innerHTML = '';
+            return true;
+        } else {
+            console.log('erreur firstname');
+            firstNameErrorMessage.innerHTML = 'Seuls les lettres et tirets sont acceptés';
+            return false;
+        }
+    }
+
+    function validateLastName(){
+        let lastNameErrorMessage = document.getElementById('lastNameErrorMsg');   
+        if (wordRegex(contact.lastName.value)) {
+            lastNameErrorMessage.innerHTML = '';
+            return true;
+        } else {
+            console.log('erreur lastName');
+            lastNameErrorMessage.innerHTML = 'Seuls les lettres et tirets sont acceptés';
+            return false;
+        }
+    }
+
+    function validateAddress(){
+        let addressErrorMessage = document.getElementById('addressErrorMsg');
+        if (addressRegex(contact.address.value)){
+            addressErrorMessage.innerHTML = '';
+            return true;
+        } else {
+            console.log('erreur address');
+            addressErrorMessage.innerHTML = 'Veuillez entrer une adresse valide';
+            return false;
+        }
+    }
+
+    function validateCity(){
+        let cityErrorMessage = document.getElementById('cityErrorMsg');   
+        if (wordRegex(contact.city.value)) {
+            cityErrorMessage.innerHTML = '';
+            return true;
+        } else {
+            console.log('erreur city');
+            cityErrorMessage.innerHTML = 'Seuls les lettres et tirets sont acceptés';
+            return false;
+        }
+    }
+
+    function validateEmail(){
+        let emailErrorMessage = document.getElementById('emailErrorMsg');
+        if (emailRegex(contact.email.value)) {
+            emailErrorMessage.innerHTML = '';
+            return true;
+        } else {
+            console.log('erreur email');
+            emailErrorMessage.innerHTML = 'Veuillez entrer un e-mail valide';
+            return false;
+        }
+    }
+
+    if (
+        validateFirstName() && 
+        validateLastName() && 
+        validateAddress() && 
+        validateCity() && 
+        validateEmail()) {
+    console.log("le formulaire est validé")
+    console.log(contact);
+    console.log(products);
+    sendToServer();
+    } else {
+        console.log('erreur');
+    }
+})
+
+function sendToServer(){
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({contact, products})
+        })
+        .then((response) => {
+            console.log(response);
+            return response.json();
+        })
+        .then((server) => {
+            let orderId = server.orderId;
+            console.log(orderId);
+            if (orderId !=""){
+                location.href = "confirmation.html?id=" + orderId;
+            }
+        });
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 
