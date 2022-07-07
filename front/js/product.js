@@ -108,6 +108,19 @@ fetch(productURL, {
                 cartContent = [];
                 cartContent.push(product);
             }
+
+            //Sort the cartContent by id (so the same models are next to each other in the cart)
+            function compareId(a, b){
+                if (a.id < b.id){
+                    return -1;
+                }
+                if (a.id > b.id){
+                    return 1;
+                }
+                return 0;
+            }
+            cartContent.sort(compareId);
+            
             localStorage.setItem('cartItems', JSON.stringify(cartContent));
             console.table(cartContent);
             }        
