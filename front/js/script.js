@@ -8,6 +8,7 @@ fetch("http://localhost:3000/api/products", {
     })
     .then(data=> {
         console.log(data);
+        //Get and display each product information 
         let itemsDiv = document.getElementById('items');
         for(let i = 0; i < data.length; i++){
             const itemCard = `

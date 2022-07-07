@@ -4,7 +4,7 @@ const url = new URL(str);
 const id = url.searchParams.get("id");
 const productURL = "http://localhost:3000/api/products/" + id;
 
-//Given the id, get all the elements to add to the specific product page
+//Get all the elements to add to the corresponding product page
 fetch(productURL, {
     method: 'GET'
 })
@@ -89,7 +89,7 @@ fetch(productURL, {
                 const findProduct = cartContent.find(
                     (element) => element.id === product.id && element.color === product.color
                 );
-                    //if the product is in the cart
+                    //if the product is in the cart, we adjust the quantity
                     if (findProduct){
                         let newQuantity = findProduct.quantity + product.quantity;
                             // making sure quantity is not over 100 items of the same product
@@ -120,7 +120,8 @@ fetch(productURL, {
                 return 0;
             }
             cartContent.sort(compareId);
-            
+
+            //adding the cartContent to localStorage
             localStorage.setItem('cartItems', JSON.stringify(cartContent));
             console.table(cartContent);
             }        

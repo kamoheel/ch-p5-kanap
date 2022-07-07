@@ -1,4 +1,6 @@
+//creating an array which will contain products ids only
 let products = [];
+
 fetch("http://localhost:3000/api/products", {
         method: 'GET'
     })
@@ -8,7 +10,7 @@ fetch("http://localhost:3000/api/products", {
             }
         })
         .then(data=> {
-            //Create a function that gets the product price, imageURL, description, name and alttext to add the appropriate info to the cart
+            //Creating a function that gets the product info from the api given a specific id
             let getProductInfo = function(id) {
             for (j = 0; j < data.length; j++){
                 if (data[j]._id == id){
@@ -24,12 +26,15 @@ fetch("http://localhost:3000/api/products", {
             }
             let cartDisplay = document.getElementById('cart__items');
             let cartContent = JSON.parse(localStorage.getItem('cartItems'));
+            //looping through each product of the cartContent (localStorage)
             for (let product of cartContent){
+                //getting the info from the api for each product
                 var productPrice = getProductInfo(product.id)[0];
                 let imgURL = getProductInfo(product.id)[1];
                 let description = getProductInfo(product.id)[2];
                 let name = getProductInfo(product.id)[3];
                 let altText = getProductInfo(product.id)[4];
+                //populating the array products for the post request later
                 products.push(product.id);
                 //create Article so that the products are displayed as a list
                 let itemArticle = document.createElement("article");
@@ -62,6 +67,7 @@ fetch("http://localhost:3000/api/products", {
                 
             }
 
+            //Get closest id and color of an element (used for quantity changes and deleting products)
             function getClosestIdAndColor(element){
                 //closest ancestor that is has the data-id attribute (article)
                 let article = element.closest('[data-id]');
@@ -72,12 +78,14 @@ fetch("http://localhost:3000/api/products", {
                 return [cartElementId, cartElementColor];
             }
 
+            //Finding the product (same id and color) in localStorage cartContent
             function findLS(id, color){
                 const findProductLS = cartContent.find(
                     (element) => element.id === id && element.color === color
                 );
                 return findProductLS;
             }
+
             //Handle modification of quantity in the cart
             function modifyQuantity(){
                 //getting the list of itemQuantity Classes
@@ -88,14 +96,6 @@ fetch("http://localhost:3000/api/products", {
                         cartItemQuantity[i].addEventListener('change', function(event){
                             event.preventDefault();
 
-                            // //closest ancestor that is has the data-id attribute (article)
-                            // let article = cartItemQuantity[i].closest('[data-id]');
-                            // //get the id of the item for which the quantity has been modified
-                            // let idChangedQuantity = article.getAttribute('data-id');
-                            // console.log(idChangedQuantity);
-                            // //get the color
-                            // let colorChangedQuantity = article.getAttribute('data-color');
-                            // console.log(colorChangedQuantity);
                             let cartElementId = getClosestIdAndColor(cartItemQuantity[i])[0];
                             let cartElementColor = getClosestIdAndColor(cartItemQuantity[i])[1];
                             
@@ -106,14 +106,14 @@ fetch("http://localhost:3000/api/products", {
                                 if (quantityModified > 100) {
                                     findProduct.quantity = 100;
                                 }
-                                //  else if (quantityModified = 0) {
-                                //     localStorage.removeItem(findProduct);
-                                //} 
+                                else if (quantityModified == 0) {
+                                    cartContent.splice(cartContent.indexOf(findProduct), 1);
+                                } 
                                 else {
                                     findProduct.quantity = quantityModified;
                                 }
                                 localStorage.setItem('cartItems', JSON.stringify(cartContent));
-                                console.table(cartContent);
+                                
                                 window.location.reload();
                                 return true;
                             }
@@ -122,6 +122,7 @@ fetch("http://localhost:3000/api/products", {
             }
             modifyQuantity();
 
+            //Handle deleting a product in the cart
             function deleteProduct() {
                 let deleteButton = document.getElementsByClassName('deleteItem');
                 for(let k = 0; k < deleteButton.length; k++){
@@ -132,13 +133,9 @@ fetch("http://localhost:3000/api/products", {
                         let cartElementColor = getClosestIdAndColor(deleteButton[k])[1];
                         let findProduct = findLS(cartElementId, cartElementColor);
                         if(findProduct){
-                            console.log(findProduct.id);
-                            console.log(findProduct.quantity);
-                            console.log(findProduct);
                             //To delete the item in the localStorage array
                             cartContent.splice(cartContent.indexOf(findProduct), 1);
                             localStorage.setItem('cartItems', JSON.stringify(cartContent));
-                            console.table(cartContent);
                             window.location.reload();
                             return true;
                         }                      
@@ -146,6 +143,8 @@ fetch("http://localhost:3000/api/products", {
                 }
             }
             deleteProduct();
+
+            console.table(cartContent);
 
             //display total price
             let articleQuantity = document.getElementById('totalQuantity');
@@ -174,8 +173,7 @@ let contact = {
 order.addEventListener('click', function(event){
     event.preventDefault();
 
-
-
+    //creating Regex for the different form's inputs 
     function wordRegex(value){
         return /^[A-Z][A-Za-z\é\è\ê\-]+$/.test(value);
     } //accepte lettres minuscules, majuscule, tiret, espace (s), plusieurs iterations(+)
@@ -188,6 +186,7 @@ order.addEventListener('click', function(event){
         return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value);
     }
 
+    //validating each contact form input
     function validateFirstName(){
         let firstNameErrorMessage = document.getElementById('firstNameErrorMsg');   
         if (wordRegex(contact.firstName.value)) {
@@ -248,6 +247,7 @@ order.addEventListener('click', function(event){
         }
     }
 
+    //Sending to server only if the whole form is validated
     if (
         validateFirstName() && 
         validateLastName() && 
@@ -263,6 +263,7 @@ order.addEventListener('click', function(event){
     }
 })
 
+//Sending to server contact object and products array and getting an orderId
 function sendToServer(){
     fetch("http://localhost:3000/api/products/order", {
         method: "POST",
@@ -283,8 +284,6 @@ function sendToServer(){
                 location.href = "confirmation.html?id=" + orderId;
             }
         });
-
-
 }
 
 
