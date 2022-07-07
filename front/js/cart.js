@@ -247,19 +247,17 @@ order.addEventListener('click', function(event){
         }
     }
 
-    //Sending to server only if the whole form is validated
+    //Sending to server only if the whole form is validated and if the cart is not empty
     if (
         validateFirstName() && 
         validateLastName() && 
         validateAddress() && 
         validateCity() && 
-        validateEmail()) {
-    console.log("le formulaire est validé")
-    console.log(contact);
-    console.log(products);
+        validateEmail() &&
+        products.length > 0) {
     sendToServer();
     } else {
-        console.log('erreur');
+        console.log('erreur de validation');
     }
 })
 
