@@ -12,28 +12,29 @@ fetch("http://localhost:3000/api/products", {
         .then(data=> {
             //Creating a function that gets the product info from the api given a specific id
             let getProductInfo = function(id) {
-            for (j = 0; j < data.length; j++){
-                if (data[j]._id == id){
-                var price = data[j].price;
-                let imgUrl = data[j].imageUrl;
-                let description = data[j].description;
-                let name = data[j].name;
-                let altText = data[j].altTxt;
-                //eavh value is called later with an array index getProductInfo(id)[0]
-                return [price, imgUrl, description, name, altText];
+                for (j = 0; j < data.length; j++){
+                    if (data[j]._id == id){
+                        var productInfo = {
+                            "price": data[j].price,
+                            "imgUrl": data[j].imageUrl,
+                            "description": data[j].description,
+                            "name": data[j].name,
+                            "altText": data[j].altTxt
+                        };
+                        return productInfo;
+                    }
                 }
-            }
             }
             let cartDisplay = document.getElementById('cart__items');
             let cartContent = JSON.parse(localStorage.getItem('cartItems'));
             //looping through each product of the cartContent (localStorage)
             for (let product of cartContent){
                 //getting the info from the api for each product
-                var productPrice = getProductInfo(product.id)[0];
-                let imgURL = getProductInfo(product.id)[1];
-                let description = getProductInfo(product.id)[2];
-                let name = getProductInfo(product.id)[3];
-                let altText = getProductInfo(product.id)[4];
+                const productPrice = getProductInfo(product.id).price;
+                const imgURL = getProductInfo(product.id).imgUrl;
+                const description = getProductInfo(product.id).description;
+                const name = getProductInfo(product.id).name;
+                const altText = getProductInfo(product.id).altText;
                 //populating the array products for the post request later
                 products.push(product.id);
                 //create Article so that the products are displayed as a list
@@ -75,7 +76,10 @@ fetch("http://localhost:3000/api/products", {
                 let cartElementId = article.getAttribute('data-id');
                 //get the color
                 let cartElementColor = article.getAttribute('data-color');
-                return [cartElementId, cartElementColor];
+                return { 
+                    id: cartElementId, 
+                    color: cartElementColor
+                };
             }
 
             //Finding the product (same id and color) in localStorage cartContent
@@ -96,8 +100,8 @@ fetch("http://localhost:3000/api/products", {
                         cartItemQuantity[i].addEventListener('change', function(event){
                             event.preventDefault();
 
-                            let cartElementId = getClosestIdAndColor(cartItemQuantity[i])[0];
-                            let cartElementColor = getClosestIdAndColor(cartItemQuantity[i])[1];
+                            let cartElementId = getClosestIdAndColor(cartItemQuantity[i]).id;
+                            let cartElementColor = getClosestIdAndColor(cartItemQuantity[i]).color;
                             
                             //find the product in localStorage to modify the quantity stored
                             let findProduct = findLS(cartElementId, cartElementColor);
@@ -129,8 +133,8 @@ fetch("http://localhost:3000/api/products", {
                     deleteButton[k].addEventListener("click", function(event){
                         event.preventDefault();
 
-                        let cartElementId = getClosestIdAndColor(deleteButton[k])[0];
-                        let cartElementColor = getClosestIdAndColor(deleteButton[k])[1];
+                        let cartElementId = getClosestIdAndColor(deleteButton[k]).id;
+                        let cartElementColor = getClosestIdAndColor(deleteButton[k]).color;
                         let findProduct = findLS(cartElementId, cartElementColor);
                         if(findProduct){
                             //To delete the item in the localStorage array
@@ -153,7 +157,7 @@ fetch("http://localhost:3000/api/products", {
             let totalPrice = document.getElementById('totalPrice');
             let sum = 0;
             for (let l = 0; l < cartContent.length; l++) {
-                sum += (cartContent[l].quantity) * (getProductInfo(cartContent[l].id)[0])
+                sum += (cartContent[l].quantity) * (getProductInfo(cartContent[l].id).price)
             };
             totalPrice.innerHTML = `${sum}`;
         })
