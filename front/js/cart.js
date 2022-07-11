@@ -11,7 +11,7 @@ fetch("http://localhost:3000/api/products", {
         })
         .then(data=> {
             //Creating a function that gets the product info from the api given a specific id
-            let getProductInfo = function(id) {
+            function getProductInfo(id) {
                 for (j = 0; j < data.length; j++){
                     if (data[j]._id == id){
                         var productInfo = {
@@ -29,12 +29,12 @@ fetch("http://localhost:3000/api/products", {
             let cartContent = JSON.parse(localStorage.getItem('cartItems'));
             //looping through each product of the cartContent (localStorage)
             for (let product of cartContent){
+                let pInfo = getProductInfo(product.id);
                 //getting the info from the api for each product
-                const productPrice = getProductInfo(product.id).price;
-                const imgURL = getProductInfo(product.id).imgUrl;
-                const description = getProductInfo(product.id).description;
-                const name = getProductInfo(product.id).name;
-                const altText = getProductInfo(product.id).altText;
+                const productPrice = pInfo.price;
+                const imgURL = pInfo.imgUrl;
+                const name = pInfo.name;
+                const altText = pInfo.altText;
                 //populating the array products for the post request later
                 products.push(product.id);
                 //create Article so that the products are displayed as a list
