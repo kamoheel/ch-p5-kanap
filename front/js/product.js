@@ -83,6 +83,12 @@ fetch(productURL, {
             }; 
             console.log(product);
 
+            function cartConfirmation() {
+                let cartButtonDiv = document.querySelector('.item__content__addButton');
+                let cartMessage = document.createElement('div');
+                cartButtonDiv.appendChild(cartMessage);
+                cartMessage.innerHTML = "Le produit a bien été ajouté au panier";
+            }
             //if the cart has products
             if (cartContent) {
                 //findProduct: is the product we want to add already in the cart? (same id + same color) 
@@ -98,15 +104,18 @@ fetch(productURL, {
                             } else {
                                 findProduct.quantity = 100 ;
                             }
+                            cartConfirmation();
                     //if the product is not in the cart
                     } else {
-                        cartContent.push(product);                        
+                        cartContent.push(product);    
+                        cartConfirmation();                    
                     }
             }
             //if the cart is empty
             else {
                 cartContent = [];
                 cartContent.push(product);
+                cartConfirmation();
             }
 
             //Sort the cartContent by id (so the same models are next to each other in the cart)
