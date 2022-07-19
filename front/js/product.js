@@ -81,14 +81,19 @@ fetch(productURL, {
                 quantity: parseInt(quantity),
                 color: color
             }; 
-            console.log(product);
 
+            //Unique confirmation message for adding to Cart
+            let cartButtonDiv = document.querySelector('.item__content__addButton');
+            let cartMessage = document.createElement('div');
+            cartMessage.classList.add("confirmationMessage");
+            cartButtonDiv.appendChild(cartMessage);
+            let confirmationMsg = document.querySelector(".confirmationMessage");
             function cartConfirmation() {
-                let cartButtonDiv = document.querySelector('.item__content__addButton');
-                let cartMessage = document.createElement('div');
-                cartButtonDiv.appendChild(cartMessage);
-                cartMessage.innerHTML = "Le produit a bien été ajouté au panier";
+                if (confirmationMsg.innerHTML == ""){
+                    confirmationMsg.innerHTML = "Le produit a bien été ajouté au panier";
+                }
             }
+
             //if the cart has products
             if (cartContent) {
                 //findProduct: is the product we want to add already in the cart? (same id + same color) 
@@ -104,18 +109,23 @@ fetch(productURL, {
                             } else {
                                 findProduct.quantity = 100 ;
                             }
-                            cartConfirmation();
+                                cartConfirmation()
+                            
+                            
                     //if the product is not in the cart
                     } else {
                         cartContent.push(product);    
-                        cartConfirmation();                    
+                        cartConfirmation()
+                                        
                     }
             }
             //if the cart is empty
             else {
                 cartContent = [];
                 cartContent.push(product);
-                cartConfirmation();
+                
+                    cartConfirmation()
+                
             }
 
             //Sort the cartContent by id (so the same models are next to each other in the cart)
